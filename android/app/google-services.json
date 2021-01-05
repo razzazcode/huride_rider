@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "141675991960",
+    "project_id": "huride-b5b7c",
+    "storage_bucket": "huride-b5b7c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141675991960:android:4a8018eeab05b9085191ed",
+        "android_client_info": {
+          "package_name": "com.razzazcode.huriderider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141675991960-7ls6i53q7f1h9s76otlbbvu6mnn7oqnt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA1z4D80Tz2sbfGBsViMYVklDHrrvvtoE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "141675991960-7ls6i53q7f1h9s76otlbbvu6mnn7oqnt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
