@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
 
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      initialRoute: loginScreen.idScreen,
+      initialRoute: MainScreen.idScreen,
       routes: {
 
         RegisterationScreen.idScreen: (context) => RegisterationScreen(),
