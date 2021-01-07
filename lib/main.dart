@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
 
 
-        fontFamily: "Signatra",
+        fontFamily: "Brand Bold",
         primarySwatch: Colors.blue,
 
         visualDensity: VisualDensity.adaptivePlatformDensity,

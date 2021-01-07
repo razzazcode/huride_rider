@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:huride_rider/AllWidgets/Divider.dart';
 
 
 
@@ -49,7 +50,39 @@ class _MainScreenState extends State<MainScreen> {
 
       ),
       
-      
+
+      drawer: Container (
+
+        color: Colors.lightGreenAccent,
+
+        width: 255.0,
+        child: Drawer(
+
+          child: ListView(
+
+            children: [
+              Container(
+
+                height: 165.0,
+                child: DrawerHeader (
+
+                  decoration: BoxDecoration( color: Colors.white),
+
+                  child: Row(
+
+                    children: [
+
+                      Image.asset("name"),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+
+
       body: Stack(
         children: [
           GoogleMap(
@@ -78,7 +111,7 @@ class _MainScreenState extends State<MainScreen> {
 
               child: Container(
 
-                height: 245.0,
+                height: 320.0,
                 decoration: BoxDecoration(
 
                   color: Colors.white,
@@ -98,17 +131,158 @@ class _MainScreenState extends State<MainScreen> {
 
                 ),
 
-                child: Column(
-                  
-                  children: [
-                    SizedBox(height: 6.0,),
-                    Text("hi there " , style:  TextStyle (fontSize: 12.0)  ,),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0 , vertical: 18.0),
+                  child: Column(
 
-                    Text("where to " , style:  TextStyle (fontSize: 20.0 , fontFamily: "Brand-Bold")  ,),
 
-                  ],
-                  
-                  
+                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                    children: [
+                      SizedBox(height: 6.0,),
+                      Text("hi there " , style:  TextStyle (fontSize: 12.0)  ,),
+
+                      Text("where to " , style:  TextStyle (fontSize: 20.0 , fontFamily: "Brand-Bold")  ,),
+
+
+                      SizedBox(height: 6.0,),
+
+                      Container(
+
+                        decoration: BoxDecoration(
+
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5.0) ,
+                          boxShadow: [
+
+                            BoxShadow(
+
+                              color: Colors.black,
+                              blurRadius: 6.0,
+                              spreadRadius: 0.5,
+                              offset: Offset(0.7 , 0.7 ),
+
+                            ),
+
+                          ],
+
+                        ),
+
+
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+
+                            children: [
+                              Icon( Icons.search , color: Colors.blue,),
+
+                              SizedBox(width: 10.0,),
+                              Text(" search dropp off there "),
+
+                            ],
+                          ),
+                        ),
+
+
+
+                      ),
+
+
+
+
+                      SizedBox(height: 24.0,),
+
+                      Row(
+
+                        children: [
+                          Icon( Icons.home , color: Colors.green,),
+
+                          SizedBox(width: 12.0,),
+
+                          Column(
+
+                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                            children: [
+
+                              Text(" Add home "),
+
+                              SizedBox(height: 4.0,) ,
+
+                              Text("home adress here " , style:  TextStyle (
+
+                                color: Colors.grey[200],
+                                  fontSize: 12.0 ,
+                                  fontFamily: "Brand-Bold")  ,
+
+                              ),
+
+
+                            ],
+                          ),
+
+                        ],
+                      ),
+
+
+
+
+                      SizedBox(height: 10.0,),
+
+
+
+
+
+
+                      DividerWidget(),
+
+                      SizedBox(height: 16.0,),
+
+
+                      Row(
+
+                        children: [
+                          Icon( Icons.work , color: Colors.green,),
+
+                          SizedBox(width: 12.0,),
+
+                          Column(
+
+                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                            children: [
+
+                              Text(" Add work "),
+
+                              SizedBox(height: 4.0,) ,
+
+                              Text("office adress here " , style:  TextStyle (
+
+                                  color: Colors.blueGrey,
+                                  fontSize: 12.0 ,
+                                  fontFamily: "Brand-Bold")  ,
+
+                              ),
+
+
+
+                            ],
+                          ),
+
+
+
+                        ],
+                      ),
+
+
+
+
+
+
+                    ],
+
+
+                  ),
                 ),
                 
           ),
