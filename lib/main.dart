@@ -3,6 +3,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:huride_rider/AllScreens/mainscreen.dart';
 import 'package:huride_rider/AllScreens/registerationScreen.dart';
+import 'package:huride_rider/DataHandler/appData.dart';
+import 'package:provider/provider.dart';
 
 import 'AllScreens/loginScreen.dart';
 
@@ -24,32 +26,35 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'HuRide',
-      theme: ThemeData(
+    return ChangeNotifierProvider(
+
+      create: (context) => AppData(),
+      child: MaterialApp(
+        title: 'HuRide',
+        theme: ThemeData(
 
 
-        fontFamily: "Brand Bold",
-        primarySwatch: Colors.blue,
+          primarySwatch: Colors.blue,
 
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        initialRoute: MainScreen.idScreen,
+        routes: {
+
+          RegisterationScreen.idScreen: (context) => RegisterationScreen(),
+
+          loginScreen.idScreen: (context) => loginScreen(),
+
+          MainScreen.idScreen: (context) => MainScreen(),
+
+
+        },
+
+
+        debugShowCheckedModeBanner: false,
+
+
       ),
-      initialRoute: MainScreen.idScreen,
-      routes: {
-
-        RegisterationScreen.idScreen: (context) => RegisterationScreen(),
-
-        loginScreen.idScreen: (context) => loginScreen(),
-
-        MainScreen.idScreen: (context) => MainScreen(),
-
-
-      },
-
-
-      debugShowCheckedModeBanner: false,
-
-
     );
   }
 }

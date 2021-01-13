@@ -4,7 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:huride_rider/AllScreens/searchScreen.dart';
 import 'package:huride_rider/AllWidgets/Divider.dart';
+import 'package:huride_rider/Assstants/assistanntMethods.dart';
+import 'package:provider/provider.dart';
 
 
 
@@ -45,15 +48,23 @@ double bottomPaddingOfMap = 0;
 
 void locatePosition () async {
 
-  Position posotion = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-  currentPosition = posotion;
+  currentPosition = position;
 
-  LatLng latLngPosition = LatLng(posotion.latitude, posotion.longitude);
+  LatLng latLngPosition = LatLng(position.latitude, position.longitude);
 
   CameraPosition cameraPosition = new CameraPosition(target: latLngPosition, zoom: 14);
 
   newGoogleMapController.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+  String address = await AssistantMethods.searchCoodinateAdress(position , context);
+
+  print (" tis is your address" + address);
+
+  String locas = position.latitude as String;
+
+
 }
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -72,7 +83,8 @@ void locatePosition () async {
 
       appBar: AppBar(
 
-        title: Text(" Main Screen "),
+        title: Text(" Main Screen "
+        ),
 
 
       ),
@@ -270,52 +282,63 @@ DividerWidget(),
 
   children: [
     SizedBox(height: 6.0,),
-    Text("hi there " , style:  TextStyle (fontSize: 12.0)  ,),
+    Text("hi there "  , style:  TextStyle (fontSize: 12.0)  ,),
 
     Text("where to " , style:  TextStyle (fontSize: 20.0 , fontFamily: "Brand-Bold")  ,),
 
 
- SizedBox(height: 6.0,),
+ SizedBox(height: 20.0,),
 
- Container(
-
-   decoration: BoxDecoration(
-
-     color: Colors.white,
-     borderRadius: BorderRadius.circular(5.0) ,
-     boxShadow: [
-
-       BoxShadow(
-
-       color: Colors.black,
-       blurRadius: 6.0,
-       spreadRadius: 0.5,
-       offset: Offset(0.7 , 0.7 ),
-
-     ),
-
-   ],
-
- ),
+ GestureDetector(
 
 
-   child: Padding(
-     padding: const EdgeInsets.all(12.0),
-     child: Row(
+   onTap: () {
 
-       children: [
-         Icon( Icons.search , color: Colors.blue,),
+     Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen()));
 
-         SizedBox(width: 10.0,),
-         Text(" search dropp off there "),
+   },
 
-       ],
-     ),
+
+   child: Container(
+
+     decoration: BoxDecoration(
+
+       color: Colors.white,
+       borderRadius: BorderRadius.circular(5.0) ,
+       boxShadow: [
+
+         BoxShadow(
+
+         color: Colors.black,
+         blurRadius: 6.0,
+         spreadRadius: 0.5,
+         offset: Offset(0.7 , 0.7 ),
+
+       ),
+
+     ],
+
    ),
 
 
+     child: Padding(
+       padding: const EdgeInsets.all(12.0),
+       child: Row(
 
-                      ),
+         children: [
+           Icon( Icons.search , color: Colors.blue,),
+
+           SizedBox(width: 10.0,),
+           Text(" search dropp off there "),
+
+         ],
+       ),
+     ),
+
+
+
+                        ),
+ ),
 
 
 
@@ -335,18 +358,27 @@ DividerWidget(),
 
         children: [
 
-          Text(" Add home "),
+          Text(
+           //   Provider.of(context).pickUpLocation != null ?
+
+           //   Provider.of(context).pickUpLocation.placeName :
+
+
+              "Add Home"
+
+
+
+          ),
 
  SizedBox(height: 4.0,) ,
 
  Text("home adress here " , style:  TextStyle (
 
-   color: Colors.grey[200],
+   color: Colors.black,
      fontSize: 12.0 ,
      fontFamily: "Brand-Bold")  ,
 
  ),
-
 
         ],
       ),
@@ -355,13 +387,7 @@ DividerWidget(),
   ),
 
 
-
-
  SizedBox(height: 10.0,),
-
-
-
-
 
 
  DividerWidget(),
