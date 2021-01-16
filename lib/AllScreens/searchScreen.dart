@@ -193,7 +193,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     return;
   }
-
+// eehh
   print("Places predictions Response :: ");
   print(res);
     }
