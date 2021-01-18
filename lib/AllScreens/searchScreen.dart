@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:huride_rider/AllWidgets/Divider.dart';
 import 'package:huride_rider/Assstants/requestAssistant.dart';
 import 'package:huride_rider/DataHandler/appData.dart';
+import 'package:huride_rider/Models/placePredictions.dart';
 import 'package:huride_rider/configMaps.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +20,9 @@ class _SearchScreenState extends State<SearchScreen> {
   TextEditingController pickUpTextEditingController = TextEditingController();
 
   TextEditingController dropOffTextEditingController = TextEditingController();
+
+
+  List<PlacePredictions> placePredictionList = [] ;
 
 
   @override
@@ -175,6 +180,32 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
     ),
 
+
+          // tile for predictions
+
+          SizedBox(height: 8.0,),
+          (placePredictionList.length > 0 )
+          ? Padding(padding: EdgeInsets.symmetric(vertical: 8.0 , horizontal: 16.0),
+              
+              child:
+              ListView.separated(
+
+                  padding : EdgeInsets.all(0.0),
+
+              itemBuilder: (context, index) {
+
+                    return PredictionTile(placePredictions : placePredictionList[index],) ;
+    },
+
+                separatorBuilder: (BuildContext context , int index) => DividerWidget(),
+                itemCount: placePredictionList.length,
+
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics (),
+    ),
+
+    )
+              : Container(),
         ],
       ),
     );
@@ -194,8 +225,89 @@ class _SearchScreenState extends State<SearchScreen> {
     return;
   }
 // eehh
-  print("Places predictions Response :: ");
-  print(res);
+ // print("Places predictions Response :: ");
+  // print(res);
+
+  if( res["status"] == "OK") {
+
+    var predictions = res["predictions"];
+    var placesList = (predictions as List).map((e) => PlacePredictions.fromJson(e)).toList();
+
+
+    setState(() {
+
+      placePredictionList = placesList;
+    });
+
+  }
     }
+  }
+}
+
+class PredictionTile extends StatelessWidget {
+
+
+  final PlacePredictions placePredictions ;
+
+  PredictionTile({Key key, this.placePredictions})  : super(key: key);
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+
+
+      child: Column(
+
+        children: [
+
+
+          SizedBox(width: 10.0,),
+
+
+
+          Row(
+
+            children: [
+              Icon( Icons.add_location , color: Colors.blue,),
+
+              SizedBox(width: 14.0,),
+
+              Expanded(
+                child: Column(
+
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+
+                    SizedBox(height: 8.0,),
+
+                    Text(" placePredictions.main_text " , overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16.0),),
+
+                    SizedBox(height: 2.0,),
+
+                    Text(" placePredictions.secondary_text" ,overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16.0, color: Colors.grey),),
+
+                    SizedBox(height: 8.0,),
+
+                  ],
+
+                ),
+              ),
+
+            ],
+          ),
+
+
+
+          SizedBox(width: 10.0,),
+
+        ],
+      ),
+
+
+
+
+    );
   }
 }
