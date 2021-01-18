@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:huride_rider/AllWidgets/Divider.dart';
+import 'package:huride_rider/AllWidgets/progressDialog.dart';
 import 'package:huride_rider/Assstants/requestAssistant.dart';
 import 'package:huride_rider/DataHandler/appData.dart';
+import 'package:huride_rider/Models/address.dart';
 import 'package:huride_rider/Models/placePredictions.dart';
 import 'package:huride_rider/configMaps.dart';
 import 'package:provider/provider.dart';
@@ -156,6 +159,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
                           onChanged: (val) {
 
+
+                            print (" de badal el places list until you get a visa :D");
                             findPlace(val);
                           },
 
@@ -254,60 +259,105 @@ class PredictionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return FlatButton(
 
 
-      child: Column(
+      padding: EdgeInsets.all(0.0),
+      onPressed: ()
+      {
+        voidgetPlaceAddressDetails(placePredictions.place_id , context);
 
-        children: [
+      },
+      child: Container(
 
 
-          SizedBox(width: 10.0,),
+        child: Column(
+
+          children: [
+
+
+            SizedBox(width: 10.0,),
 
 
 
-          Row(
+            Row(
 
-            children: [
-              Icon( Icons.add_location , color: Colors.blue,),
+              children: [
+                Icon( Icons.add_location , color: Colors.blue,),
 
-              SizedBox(width: 14.0,),
+                SizedBox(width: 14.0,),
 
-              Expanded(
-                child: Column(
+                Expanded(
+                  child: Column(
 
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
 
-                  children: [
+                    children: [
 
-                    SizedBox(height: 8.0,),
+                      SizedBox(height: 8.0,),
 
-                    Text(" placePredictions.main_text " , overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16.0),),
+                      Text(" placePredictions.main_text " , overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16.0),),
 
-                    SizedBox(height: 2.0,),
+                      SizedBox(height: 2.0,),
 
-                    Text(" placePredictions.secondary_text" ,overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16.0, color: Colors.grey),),
+                      Text(" placePredictions.secondary_text" ,overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16.0, color: Colors.grey),),
 
-                    SizedBox(height: 8.0,),
+                      SizedBox(height: 8.0,),
 
-                  ],
+                    ],
 
+                  ),
                 ),
-              ),
 
-            ],
-          ),
-
+              ],
+            ),
 
 
-          SizedBox(width: 10.0,),
 
-        ],
+            SizedBox(width: 10.0,),
+
+          ],
+        ),
+
+
+
+
       ),
-
-
-
-
     );
+  }
+
+  voidgetPlaceAddressDetails (String placeId , context) async {
+
+    
+    
+    showDialog(context: context , builder: (BuildContext context) => ProgressDialog(message: "Setting DroppOff , please wait ..  ",));
+
+
+    String placeDetailsUrl = "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey" ;
+
+    var res = await RequestAssistant.getRequest(placeDetailsUrl);
+
+    Navigator.pop(context);
+
+    if ( res == "failed") {
+
+      return;
+    }
+
+    if (res["status"] == "OK")
+      {
+        Address address = Address();
+        address.placeName = res ["result"]["name"];
+        address.placeId = placeId;
+        address.latitude = res ["result"]["geometry"]["location"]["lat"];
+        address.longitude = res ["result"]["geometry"]["location"]["lng"];
+
+
+        Provider.of<AppData>(context , listen: false).updatePickUpLocationAddress(address);
+
+        print("This is drop off location :: ");
+        print(address.placeName);
+
+      }
   }
 }
