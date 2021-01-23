@@ -76,7 +76,19 @@ class AssistantMethods
 
 
   }
-//  voidhttps://maps.googleapis.com/maps/api/directions/json?
-// origin=Toronto&destination=Montreal
-// &key=YOUR_API_KEY
+
+
+  static int calculateFare(DirectionDetails directionDetails) {
+
+   double timeTravelFare = (directionDetails.durationValue / 60 ) * 0.20 ;
+
+   double distanceTravelFare = (directionDetails.distanceValue / 1000 ) * 0.20 ;
+
+   double totalFareAmount = timeTravelFare + distanceTravelFare ;
+
+   //totalFare = amount in dollar * local currency
+
+    return totalFareAmount.truncate();
+
+  }
 }

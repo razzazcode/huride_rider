@@ -1,16 +1,19 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:huride_rider/AllScreens/loginScreen.dart';
 import 'package:huride_rider/AllScreens/searchScreen.dart';
 import 'package:huride_rider/AllWidgets/Divider.dart';
 import 'package:huride_rider/AllWidgets/progressDialog.dart';
 import 'package:huride_rider/Assstants/assistanntMethods.dart';
 import 'package:huride_rider/DataHandler/appData.dart';
+import 'package:huride_rider/Models/directionDetails.dart';
 import 'package:provider/provider.dart';
 
 
@@ -42,10 +45,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
 GlobalKey<ScaffoldState> scaffoldkey = new GlobalKey<ScaffoldState> ();
 
-
+DirectionDetails tripDirectionDetails ;
 List<LatLng> pLineCoordinate = [] ;
 
-Set<Polyline> polykineSet = {} ;
+Set<Polyline> polyLineSet = {} ;
 
 Position currentPosition ;
 
@@ -62,6 +65,30 @@ double rideDetailsContainerHeight = 0 ;
 
 double searchContainerHeight = 300.0 ;
 
+bool drawerOpen = true ;
+
+
+resetApp(){
+
+  setState(() {
+
+    drawerOpen = true;
+
+    searchContainerHeight = 300.0 ;
+    rideDetailsContainerHeight = 0.0 ;
+
+    bottomPaddingOfMap = 230.0;
+
+polyLineSet.clear();
+markerSet.clear();
+circleSet.clear();
+pLineCoordinate.clear();
+  });
+
+
+  locatePosition();
+}
+
 void displayRideDetailsContainer( ) async {
 
   await getPlaceDirection();
@@ -72,6 +99,8 @@ void displayRideDetailsContainer( ) async {
     rideDetailsContainerHeight = 240.0 ;
 
     bottomPaddingOfMap = 230.0;
+
+    drawerOpen = false;
 
   });
 }
@@ -184,7 +213,20 @@ DividerWidget(),
                 title:   Text("About " , style:  TextStyle (fontSize: 15.0 ),),
               ),
 
+              GestureDetector(
 
+                onTap: () {
+
+                  FirebaseAuth.instance.signOut();
+
+                  Navigator.pushNamedAndRemoveUntil(context, loginScreen.idScreen, (route) => false);
+                },
+                child: ListTile(
+
+                  leading: Icon (Icons.info),
+                  title:   Text("Sign Out " , style:  TextStyle (fontSize: 15.0 ),),
+                ),
+              ),
 
             ],
           ),
@@ -209,7 +251,10 @@ DividerWidget(),
             zoomControlsEnabled: true,
 
 
-            polylines: polykineSet,
+            polylines: polyLineSet,
+
+            markers: markerSet,
+            circles: circleSet,
 
             onMapCreated: (GoogleMapController controller)
             {
@@ -231,14 +276,22 @@ DividerWidget(),
 
           Positioned(
 
-            top: 45.0,
+            top: 38.0,
             left: 22.0,
             child: GestureDetector(
 
               onTap: (){
 
-                scaffoldkey.currentState.openDrawer();
+if(drawerOpen) {
 
+  scaffoldkey.currentState.openDrawer();
+
+}
+else{
+
+  resetApp();
+
+}
               },
               child: Container(
 
@@ -261,7 +314,7 @@ DividerWidget(),
                 child: CircleAvatar(
 
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.menu, color: Colors.black,),
+                  child: Icon((drawerOpen) ? Icons.menu : Icons.close, color: Colors.black,),
                   radius: 20.0,
 
                 ),
@@ -548,10 +601,22 @@ displayRideDetailsContainer();
                                 children: [
                                   Text("Car" , style: TextStyle(fontSize: 18.0 , fontFamily: "Brand-Bold"),) ,
 
-                                  Text("10km" , style: TextStyle(fontSize: 18.0 , color: Colors.grey),) ,
+                                  Text(
+                                    (( tripDirectionDetails != null) ?  tripDirectionDetails.distanceText : '') , style: TextStyle(fontSize: 18.0 , color: Colors.grey),
+
+                                  ) ,
 
                                 ],
-                              )
+                              ),
+                              
+                              Expanded(child: Container()),
+
+                              Text(
+
+                                (  ( tripDirectionDetails != null)  ? '\$${AssistantMethods.calculateFare(tripDirectionDetails)}' : ''), style: TextStyle(fontFamily: "Brand-Bold"),
+
+                              ) ,
+
                             ],
                           ),
                         ),
@@ -631,6 +696,14 @@ builder: (BuildContext context ) => ProgressDialog(message: "Please wait ...",) 
 
 var details = await AssistantMethods.obtainPlaceDirectionDetails(pickUpLatLng, dropOffLatLng);
 
+
+
+setState(() {
+
+  tripDirectionDetails = details;
+});
+
+
 Navigator.pop(context);
 print("this is Encoded points");
 print(details.encodedPoints);
@@ -650,7 +723,7 @@ pLineCoordinate.add(    LatLng(pointLatLng.latitude , pointLatLng.longitude));
 
   });
 }
-polykineSet.clear();
+polyLineSet.clear();
 
 setState(() {
 
@@ -666,8 +739,90 @@ setState(() {
   );
 
 
-  polykineSet.add(polyline);
+  polyLineSet.add(polyline);
 
 });
+
+LatLngBounds latLngBounds;
+
+if(pickUpLatLng.latitude > dropOffLatLng.latitude && pickUpLatLng.longitude > dropOffLatLng.longitude) {
+
+  latLngBounds = LatLngBounds(southwest: dropOffLatLng , northeast: pickUpLatLng);
+
+}
+
+
+else if(pickUpLatLng.longitude > dropOffLatLng.longitude ) {
+
+  latLngBounds = LatLngBounds(southwest: LatLng(pickUpLatLng.latitude , dropOffLatLng.longitude) , northeast: LatLng(dropOffLatLng.latitude , pickUpLatLng.longitude));
+
+}
+
+else if(pickUpLatLng.latitude > dropOffLatLng.latitude ) {
+
+  latLngBounds = LatLngBounds(southwest: LatLng(dropOffLatLng.latitude , pickUpLatLng.longitude) , northeast: LatLng(pickUpLatLng.latitude , dropOffLatLng.longitude));
+
+}
+
+
+else{
+
+  latLngBounds = LatLngBounds(southwest: pickUpLatLng , northeast: dropOffLatLng);
+}
+
+newGoogleMapController.animateCamera(CameraUpdate.newLatLngBounds(latLngBounds, 70));
+
+
+Marker pickUpLocMarker = Marker(
+    icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+    infoWindow: InfoWindow(title: initialPos.placeName , snippet: " my Location"),
+
+    position: pickUpLatLng,
+
+    markerId: MarkerId("pickUpId"),
+);
+
+    Marker dropOffLocMarker = Marker(
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      infoWindow: InfoWindow(title: initialPos.placeName , snippet: " dropOffLocMarker Location"),
+
+      position: dropOffLatLng,
+
+      markerId: MarkerId("dropOffId"),
+    );
+
+    setState(() {
+
+      markerSet.add(pickUpLocMarker);
+      markerSet.add(dropOffLocMarker);
+
+    });
+
+    Circle pickUpLocCircle = Circle(
+
+        fillColor: Colors.blue,
+        center: pickUpLatLng,
+        radius: 12,
+        strokeWidth: 4,
+        strokeColor: Colors.blueAccent,
+        circleId: CircleId("pickUpCircleId"),
+    );
+
+
+    Circle dropOffCircle = Circle(
+
+      fillColor: Colors.deepPurple,
+      center: dropOffLatLng,
+      radius: 12,
+      strokeWidth: 4,
+      strokeColor: Colors.purple,
+      circleId: CircleId("dropOffCircleId"),
+    );
+    
+    setState(() {
+      
+      circleSet.add(pickUpLocCircle);
+      circleSet.add(dropOffCircle);
+    });
   }
 }

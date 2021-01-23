@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
 
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        initialRoute: MainScreen.idScreen,
+        initialRoute:  FirebaseAuth.instance.currentUser == null ?  loginScreen.idScreen : MainScreen.idScreen,
         routes: {
 
           RegisterationScreen.idScreen: (context) => RegisterationScreen(),
