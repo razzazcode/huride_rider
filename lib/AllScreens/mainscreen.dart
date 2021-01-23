@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -42,6 +43,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 GlobalKey<ScaffoldState> scaffoldkey = new GlobalKey<ScaffoldState> ();
 
 
+List<LatLng> pLineCoordinate = [] ;
+
+Set<Polyline> polykineSet = {} ;
 
 Position currentPosition ;
 
@@ -205,6 +209,7 @@ DividerWidget(),
             zoomControlsEnabled: true,
 
 
+            polylines: polykineSet,
 
             onMapCreated: (GoogleMapController controller)
             {
@@ -323,7 +328,7 @@ DividerWidget(),
 
 
    onTap: () async {
-     
+
 
 
 
@@ -627,8 +632,42 @@ builder: (BuildContext context ) => ProgressDialog(message: "Please wait ...",) 
 var details = await AssistantMethods.obtainPlaceDirectionDetails(pickUpLatLng, dropOffLatLng);
 
 Navigator.pop(context);
-
+print("this is Encoded points");
 print(details.encodedPoints);
 
+
+PolylinePoints polylinePoints = PolylinePoints();
+
+List<PointLatLng> decodedPolylinePointsResult = polylinePoints.decodePolyline(details.encodedPoints);
+
+pLineCoordinate.clear();
+
+if ( decodedPolylinePointsResult.isNotEmpty){
+
+  decodedPolylinePointsResult.forEach((PointLatLng pointLatLng) {
+
+pLineCoordinate.add(    LatLng(pointLatLng.latitude , pointLatLng.longitude));
+
+  });
+}
+polykineSet.clear();
+
+setState(() {
+
+  Polyline polyline = Polyline(
+    color: Colors.pink,
+    polylineId: PolylineId("PolylineId"),
+    jointType: JointType.round,
+    points: pLineCoordinate,
+    width: 5,
+    startCap: Cap.roundCap,
+    endCap: Cap.roundCap,
+    geodesic: true ,
+  );
+
+
+  polykineSet.add(polyline);
+
+});
   }
 }
