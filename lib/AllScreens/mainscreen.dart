@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -14,6 +16,7 @@ import 'package:huride_rider/AllWidgets/progressDialog.dart';
 import 'package:huride_rider/Assstants/assistanntMethods.dart';
 import 'package:huride_rider/DataHandler/appData.dart';
 import 'package:huride_rider/Models/directionDetails.dart';
+import 'package:huride_rider/configMaps.dart';
 import 'package:provider/provider.dart';
 
 
@@ -62,11 +65,77 @@ Set<Marker> markerSet = {};
 Set<Circle> circleSet = {};
 
 double rideDetailsContainerHeight = 0 ;
-
+double requestRideContainerHeight = 0 ;
 double searchContainerHeight = 300.0 ;
 
 bool drawerOpen = true ;
 
+DatabaseReference rideRequestRef;
+
+@override
+initState() {
+
+  super.initState();
+  AssistantMethods.getCurrentOnlineUserInfo();
+
+
+}
+
+void saveRideRequest (){
+
+  rideRequestRef = FirebaseDatabase.instance.reference().child("Ride Requests").push();
+
+  var pickUp = Provider.of<AppData>(context , listen: false).pickUpLocation;
+
+  var dropOff = Provider.of<AppData>(context , listen: false).dropOffLoocation;
+
+  Map pichUpLocMap = {
+
+    "latitude" : pickUp.latitude.toString(),
+    "longitude" : pickUp.longitude.toString(),
+  };
+
+  Map dropOffUpLocMap = {
+
+    "latitude" : dropOff.latitude.toString(),
+    "longitude" : dropOff.longitude.toString(),
+  };
+
+
+  Map rideinfoMap = {
+    "driver_id": "waiting",
+    "payment_method": "cash",
+    "pichup": pichUpLocMap,
+    "dropoff": dropOffUpLocMap,
+    "created_at": DateTime.now().toString(),
+    "rider_name": userCurrentInfo.name,
+    "rider_phone": userCurrentInfo.phone,
+    "pickup_address": pickUp.placeName,
+    "dropoff_address" : dropOff.placeName,
+  };
+
+  rideRequestRef.set(rideinfoMap);
+}
+
+
+void cancelRideRequest (){
+
+rideRequestRef.remove();
+
+
+}
+void displayRequestRideContainer() {
+
+  setState(() {
+
+    requestRideContainerHeight = 250.0;
+    rideDetailsContainerHeight = 0 ;
+    bottomPaddingOfMap = 230.0;
+    drawerOpen = true;
+  });
+
+  saveRideRequest();
+}
 
 resetApp(){
 
@@ -76,7 +145,7 @@ resetApp(){
 
     searchContainerHeight = 300.0 ;
     rideDetailsContainerHeight = 0.0 ;
-
+requestRideContainerHeight=0;
     bottomPaddingOfMap = 230.0;
 
 polyLineSet.clear();
@@ -574,6 +643,8 @@ displayRideDetailsContainer();
                   ],
 
                 ),
+
+
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical : 17.0),
                   child: Column(
@@ -649,8 +720,9 @@ Padding(     padding: const EdgeInsets.symmetric(horizontal : 20.0),
 
                         onPressed: () {
 
-                          print("clickeeed");
-                        },
+                          displayRequestRideContainer();
+
+                          },
                         color: Theme.of(context).accentColor ,
 
                         child: Padding(
@@ -674,6 +746,105 @@ Padding(     padding: const EdgeInsets.symmetric(horizontal : 20.0),
                   ),
                 ),
               ),
+            ),
+          ),
+
+          Positioned(
+
+            bottom: 0.0,
+            left: 0.0,
+            right: 0.0,
+            child: Container(
+
+              decoration: BoxDecoration(
+
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(16.0) , topRight: Radius.circular(16.0),),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    spreadRadius: 0.5,
+                    color: Colors.black45,
+                    offset: Offset(0.7 , 0.7),
+                  ),
+                ],
+              ),
+              height: requestRideContainerHeight,
+              child: Padding(
+
+                padding: const EdgeInsets.all(30.0),
+                child: Column (
+
+                  children: [
+
+                    SizedBox(
+                      height: 12.0,
+
+                    ),
+
+    SizedBox(
+    width: double.infinity,
+    child: ColorizeAnimatedTextKit(
+    onTap: () {
+    print("Tap Event");
+    },
+    text: [
+    "Requesting a ride",
+    "Please wait",
+    "Finding a driver",
+    ],
+    textStyle: TextStyle(
+    fontSize: 55.0,
+    fontFamily: "Signatra"
+    ),
+    colors: [
+      Colors.green,
+    Colors.purple,
+      Colors.pink,
+    Colors.blue,
+    Colors.yellow,
+    Colors.red,
+    ],
+    textAlign: TextAlign.center,
+   //   alignment: AlignmentDirectional.topStart,
+    ),
+    ),
+
+                    SizedBox(height: 22.0,),
+
+                    GestureDetector(
+
+                      onTap: () {
+
+                        cancelRideRequest();
+
+                        resetApp();
+
+                      },
+                      child: Container(
+
+                        height: 60.0,
+                        width: 60.0,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(26.0),
+                          border: Border.all(width: 2.0 , color: Colors.grey[300]),
+                        ),
+                        child: Icon(Icons.close , size: 26.0,),
+
+                      ),
+                    ),
+
+                    SizedBox(height: 10.0,),
+
+                    Container(
+
+                      width: double.infinity,
+                      child: Text("Cancel ride ", textAlign: TextAlign.center, style: TextStyle(fontSize: 12.0),),
+                    )
+                  ],
+                ),
+              ),
+
             ),
           )
         ],

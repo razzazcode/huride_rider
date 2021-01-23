@@ -1,10 +1,13 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:huride_rider/Assstants/requestAssistant.dart';
 import 'package:huride_rider/DataHandler/appData.dart';
 import 'package:huride_rider/Models/address.dart';
+import 'package:huride_rider/Models/allUsers.dart';
 import 'package:huride_rider/Models/directionDetails.dart';
 import 'package:huride_rider/configMaps.dart';
 import 'package:provider/provider.dart';
@@ -90,5 +93,23 @@ class AssistantMethods
 
     return totalFareAmount.truncate();
 
+  }
+
+  static void getCurrentOnlineUserInfo() async
+  {
+firebaseUser = await FirebaseAuth.instance.currentUser;
+String userId = firebaseUser.uid;
+
+DatabaseReference refrence = FirebaseDatabase.instance.reference().child("users").child(userId);
+
+refrence.once().then((DataSnapshot dataSnapshot)
+
+{
+
+  if(dataSnapshot.value != null) {
+userCurrentInfo = Users.fromSnapshot(dataSnapshot);
+
+  }
+});
   }
 }
