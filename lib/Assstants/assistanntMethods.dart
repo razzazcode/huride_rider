@@ -1,9 +1,12 @@
 
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:huride_rider/Assstants/requestAssistant.dart';
 import 'package:huride_rider/DataHandler/appData.dart';
 import 'package:huride_rider/Models/address.dart';
+import 'package:huride_rider/Models/directionDetails.dart';
+import 'package:huride_rider/configMaps.dart';
 import 'package:provider/provider.dart';
 
 class AssistantMethods
@@ -44,4 +47,36 @@ class AssistantMethods
 
     return placeAddress ;
   }
+
+  static Future<DirectionDetails> obtainPlaceDirectionDetails(LatLng initialPosition , LatLng finalosition ) async {
+
+   String directionUrl = "https://maps.googleapis.com/maps/api/directions/json?origin=${initialPosition.latitude},${initialPosition.longitude}&destination=${finalosition.latitude},${finalosition.longitude}&key=$mapKey";
+
+ var res= await RequestAssistant.getRequest(directionUrl);
+
+ if(res == "failed"){
+
+   return null;
+ }
+
+
+
+ DirectionDetails directionDetails = DirectionDetails();
+ directionDetails.encodedPoints = res["routes"]['0']["over_polyline"]['points'];
+
+   directionDetails.distanceText = res["routes"][0]["legs"][0]["distance"]["text"];
+
+   directionDetails.distanceValue = res["routes"][0]["legs"][0]["distance"]["value"];
+
+   directionDetails.durationText = res["routes"][0]["legs"][0]["distance"]["text"];
+
+   directionDetails.durationValue = res["routes"][0]["legs"][0]["distance"]["value"];
+
+   return directionDetails;
+
+
+  }
+//  voidhttps://maps.googleapis.com/maps/api/directions/json?
+// origin=Toronto&destination=Montreal
+// &key=YOUR_API_KEY
 }

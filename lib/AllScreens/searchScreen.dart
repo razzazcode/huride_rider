@@ -265,7 +265,7 @@ class PredictionTile extends StatelessWidget {
       padding: EdgeInsets.all(0.0),
       onPressed: ()
       {
-        voidgetPlaceAddressDetails(placePredictions.place_id , context);
+        getPlaceAddressDetails(placePredictions.place_id , context);
 
       },
       child: Container(
@@ -326,7 +326,7 @@ class PredictionTile extends StatelessWidget {
     );
   }
 
-  voidgetPlaceAddressDetails (String placeId , context) async {
+  void getPlaceAddressDetails (String placeId , context) async {
 
     
     
@@ -353,10 +353,12 @@ class PredictionTile extends StatelessWidget {
         address.longitude = res ["result"]["geometry"]["location"]["lng"];
 
 
-        Provider.of<AppData>(context , listen: false).updatePickUpLocationAddress(address);
+        Provider.of<AppData>(context , listen: false).dropOffLoocationAddress(address);
 
         print("This is drop off location :: ");
         print(address.placeName);
+
+        Navigator.pop(context , "obtain direction");
 
       }
   }
